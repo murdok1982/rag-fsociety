@@ -1,0 +1,6 @@
+vector_db/
+__pycache__/
+*.pyc
+extracts/
+chunks/
+memoria.json
