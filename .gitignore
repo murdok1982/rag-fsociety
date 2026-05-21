@@ -1,6 +1,33 @@
-vector_db/
 __pycache__/
-*.pyc
-extracts/
-chunks/
-memoria.json
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+venv/
+
+# Vector databases
+chroma_db/
+vector_db/
+*.db
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files
+*.gguf
+*.ggml
+*.bin
+
+# Logs
+*.log
+pip-log.txt
