@@ -1,4 +1,5 @@
 import sys, json, urllib.request
+import hispan_shield_guardian  # noqa: F401
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
