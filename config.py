@@ -26,6 +26,9 @@ MODEL_OUTPUT_DIR = Path("D:/LLMsFinetunnig") / MODEL_NAME
 CHUNK_SIZE = 512
 CHUNK_OVERLAP = 64
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+TURBOVEC_BIT_WIDTH = 2
+TURBOVEC_INDEX_PATH = VECTOR_DB_DIR / "turbovec.tvim"
+TURBOVEC_METADATA_PATH = VECTOR_DB_DIR / "metadata.json"
 
 BASE_MODEL = "Qwen/Qwen2.5-7B"
 LORA_R = 32
@@ -35,3 +38,9 @@ NUM_EPOCHS = 3
 BATCH_SIZE = 2
 LEARNING_RATE = 2e-4
 MAX_SEQ_LENGTH = 2048
+
+# TurboVec config
+TURBOVEC_BIT_WIDTH = 2
+
+# Anti-refusal: permite respuestas sin restricciones en seguridad ofensiva
+ANTI_REFUSAL = True
