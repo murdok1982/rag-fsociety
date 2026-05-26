@@ -1,11 +1,11 @@
 import sys, json, urllib.request
-import hispan_shield_guardian  # noqa: F401
+import numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
-import chromadb
 from sentence_transformers import SentenceTransformer
-from config import VECTOR_DB_DIR, EMBEDDING_MODEL
+from turbovec import IdMapIndex
+from config import VECTOR_DB_DIR, EMBEDDING_MODEL, TURBOVEC_INDEX_PATH, TURBOVEC_METADATA_PATH
 
 OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 MODEL_NAME = "fsociety"
@@ -13,18 +13,16 @@ FALLBACK_MODEL = "murdokllmhack"
 MEMORY_FILE = Path(__file__).parent / "memoria.json"
 
 print("Cargando base vectorial de seguridad...")
-if VECTOR_DB_DIR.exists():
+vector_db = None
+metadata_db = []
+embedder = None
+
+if VECTOR_DB_DIR.exists() and TURBOVEC_INDEX_PATH.exists():
     embedder = SentenceTransformer(EMBEDDING_MODEL)
-    chroma_client = chromadb.PersistentClient(path=str(VECTOR_DB_DIR))
-    try:
-        vector_db = chroma_client.get_collection("seguridad")
-        print(f"  Coleccion 'seguridad' lista ({vector_db.count()} chunks)")
-    except:
-        vector_db = None
-        print("  Coleccion 'seguridad' no encontrada")
+    vector_db = IdMapIndex.load(str(TURBOVEC_INDEX_PATH))
+    metadata_db = json.loads(TURBOVEC_METADATA_PATH.read_text(encoding="utf-8"))
+    print(f"  Índice TurboVec listo ({len(metadata_db)} chunks)")
 else:
-    embedder = None
-    vector_db = None
     print("  Base vectorial no existe")
 
 if MEMORY_FILE.exists():
@@ -36,9 +34,10 @@ else:
 def query_rag(query: str, top_k: int = 5) -> str:
     if not vector_db:
         return ""
-    q_emb = embedder.encode([query])[0]
-    results = vector_db.query(query_embeddings=[q_emb.tolist()], n_results=top_k)
-    return "\n---\n".join(results["documents"][0]) if results["documents"][0] else ""
+    q_emb = embedder.encode([query]).reshape(1, -1)
+    scores, ids = vector_db.search(q_emb, k=top_k)
+    valid_ids = [int(i) for i in ids[0] if int(i) < len(metadata_db)]
+    return "\n---\n".join(metadata_db[i]["text"] for i in valid_ids) if valid_ids else ""
 
 def ask_ollama(messages: list, model: str = None) -> str:
     m = model or MODEL_NAME
