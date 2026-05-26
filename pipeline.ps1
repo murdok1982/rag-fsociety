@@ -8,7 +8,7 @@ Write-Host "`n[1/5] Extrayendo texto de PDFs..." -ForegroundColor Yellow
 python "$scriptDir\extract_pdfs.py"
 if ($LASTEXITCODE -ne 0) { Write-Host "Error en extraccion" -ForegroundColor Red; exit 1 }
 
-Write-Host "`n[2/5] Construyendo base vectorial (ChromaDB)..." -ForegroundColor Yellow
+Write-Host "`n[2/5] Construyendo índice TurboVec (2-bit, 16x compresión)..." -ForegroundColor Yellow
 python "$scriptDir\build_vector_db.py"
 if ($LASTEXITCODE -ne 0) { Write-Host "Error en vector DB" -ForegroundColor Red; exit 1 }
 
